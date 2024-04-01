@@ -1,0 +1,276 @@
+#include <iostream>
+#include <iomanip>  //library iomanip karena menggunakan set width untuk membuat tabel
+using namespace std;
+
+struct Nilai {   //deklarasi struct nilai
+    float absen;
+    float tugas;
+    float uts;
+    float uas;
+    float nilai_akhir;
+    char nilai_huruf;
+};
+
+struct Mahasiswa {   //deklarasi struct mahasiswa 
+    string npm;
+    string nama;
+    Nilai nilai;
+    Mahasiswa* next;  //pointer yang menunjuk ke struktur Mahasiswa selanjutnya dalam linked list
+};
+
+const int MAX_TEMP_DATA = 100; // menentukan ukuran maksimum array sementara
+
+void hitungNilaiAkhir(Nilai &nilai) {   //fungsi untuk menghitung nilai akhir dan menentukan nilai hurufnya
+    nilai.nilai_akhir = 0.1 * nilai.absen + 0.2 * nilai.tugas + 0.3 * nilai.uts + 0.4 * nilai.uas;  //rumus mennghitung nilai akhir
+    if (nilai.nilai_akhir > 80) {   // if else condition untuk menentukan nilai huruf dari nilai akhir
+        nilai.nilai_huruf = 'A';
+    } else if (nilai.nilai_akhir > 70) {
+        nilai.nilai_huruf = 'B';
+    } else if (nilai.nilai_akhir > 60) {
+        nilai.nilai_huruf = 'C';
+    } else {
+        nilai.nilai_huruf = 'D';
+    }
+}
+
+void inputDataAwal(Mahasiswa*& head, int& jumlah) {  //fungsi untuk menginput dat adi bagian awal linked list
+    cout << "Masukkan data mahasiswa ke-" << jumlah + 1 << " di awal" << endl; //cout danmenunjukkan jumlah total mahasiswa yang telah dimasukkan
+    Mahasiswa* newMahasiswa = new Mahasiswa;  // mengalokasikan memori untuk objek Mahasiswa baru
+    cout << "NPM: ";
+    cin >> newMahasiswa->npm;
+    cout << "Nama: ";
+    cin.ignore();
+    getline(cin, newMahasiswa->nama);
+    cout << "Nilai Absen: ";
+    cin >> newMahasiswa->nilai.absen;
+    cout << "Nilai Tugas: ";
+    cin >> newMahasiswa->nilai.tugas;
+    cout << "Nilai UTS: ";
+    cin >> newMahasiswa->nilai.uts;
+    cout << "Nilai UAS: ";
+    cin >> newMahasiswa->nilai.uas;
+
+    hitungNilaiAkhir(newMahasiswa->nilai);
+
+    newMahasiswa->next = head;  //menetapkan pointer next dari simpul baru (newMahasiswa) ke head saat ini
+    head = newMahasiswa;  //mengubah head untuk menunjuk ke simpul baru (newMahasiswa)
+
+    jumlah++;  //meningkatkan jumlah total mahasiswa dalam linked list
+}
+
+void inputDataAkhir(Mahasiswa*& head, int& jumlah) {   //untuk memasukkan data mahasiswa baru ke dalam linked list di akhir
+    cout << "Masukkan data mahasiswa ke-" << jumlah + 1 << " di akhir" << endl; //cout & menunjukkan jumlah total mahasiswa yang telah dimasukkan sebelumnya,
+    Mahasiswa* newMahasiswa = new Mahasiswa;
+    cout << "NPM: ";
+    cin >> newMahasiswa->npm;
+    cout << "Nama: ";
+    cin.ignore();
+    getline(cin, newMahasiswa->nama);
+    cout << "Nilai Absen: ";
+    cin >> newMahasiswa->nilai.absen;
+    cout << "Nilai Tugas: ";
+    cin >> newMahasiswa->nilai.tugas;
+    cout << "Nilai UTS: ";
+    cin >> newMahasiswa->nilai.uts;
+    cout << "Nilai UAS: ";
+    cin >> newMahasiswa->nilai.uas;
+
+    hitungNilaiAkhir(newMahasiswa->nilai);  //Memanggil fungsi hitungNilaiAkhir untuk menghitung nilai akhir dan menentukan nilai huruf
+
+    newMahasiswa->next = nullptr; // tidak ada simpul berikutnya setelahnya
+
+    if (head == nullptr) {  // ini berarti linked list kosong. Simpul baru akan menjadi satu-satunya simpul dalam linked list, 
+                             //sehingga head diatur agar menunjuk ke simpul baru tersebut
+        head = newMahasiswa;
+    } else {
+        Mahasiswa* temp = head;
+        while (temp->next != nullptr) {
+            temp = temp->next;
+        }
+        temp->next = newMahasiswa;
+    }
+
+    jumlah++;
+}
+
+void insertData(Mahasiswa*& head, int& jumlah) {  //fungsi untuk menginput data di posisi tertentu selain awal & akhir
+    cout << "Masukkan data mahasiswa ke posisi tertentu" << endl;
+    int posisi;
+    cout << "Masukkan posisi: "; //input posisi dimana dat aakan ditempatkan
+    cin >> posisi;
+    if (posisi < 1 || posisi > jumlah + 1) { //Jika posisi kurang dari 1 atau lebih besar dari jumlah total mahasiswa ditambah satu
+        cout << "Posisi tidak valid!" << endl; // maka posisi tidak valid
+        return;
+    }
+    if (posisi == 1) {
+        inputDataAwal(head, jumlah); //Jika posisi adalah 1, maka panggil fungsi inputDataAwal
+    } else if (posisi == jumlah + 1) {  //Jika posisi adalah jumlah total mahasiswa ditambah satu, maka panggil fungsi inputDataAkhir
+        inputDataAkhir(head, jumlah);
+    } else {  //jika selain dari kondisi diatas, maka lakukan insert data
+        Mahasiswa* newMahasiswa = new Mahasiswa;
+        cout << "NPM: ";
+        cin >> newMahasiswa->npm;
+        cout << "Nama: ";
+        cin.ignore();
+        getline(cin, newMahasiswa->nama);
+        cout << "Nilai Absen: ";
+        cin >> newMahasiswa->nilai.absen;
+        cout << "Nilai Tugas: ";
+        cin >> newMahasiswa->nilai.tugas;
+        cout << "Nilai UTS: ";
+        cin >> newMahasiswa->nilai.uts;
+        cout << "Nilai UAS: ";
+        cin >> newMahasiswa->nilai.uas;
+
+        hitungNilaiAkhir(newMahasiswa->nilai); //Memanggil fungsi hitungNilaiAkhir untuk menghitung nilai akhir dan menentukan nilai huruf
+
+        Mahasiswa* temp = head;
+        for (int i = 1; i < posisi - 1; ++i) { //untuk menemukan simpul sebelum posisi yang ditentukan oleh pengguna dalam linked list
+            temp = temp->next;
+        }
+        newMahasiswa->next = temp->next;
+        temp->next = newMahasiswa;
+
+        jumlah++;
+    }
+}
+
+void tampilData(const Mahasiswa* head) { //fungsi untuk menampilkan data dan membuat tabel
+    if (head != nullptr) {
+        cout << "Data Mahasiswa:" << endl;
+        cout << "-------------------------------------------------------------------------------------------------------------------" << endl;
+        cout << setw(5) << "No" << setw(10) << "NPM" << setw(15) << "Nama"
+            << setw(20) << "Nilai Absen" << setw(15) << "Nilai UTS" << setw(15) << "Nilai UAS" << setw(15) << "Nilai Akhir"
+            << setw(15) << "Nilai Huruf" << endl;
+        cout << "-------------------------------------------------------------------------------------------------------------------" << endl;
+        int index = 0;
+        while (head != nullptr) {
+            cout << setw(5) << index + 1 << setw(10) << head->npm << setw(15) << head->nama << setw(15)
+                << head->nilai.absen << setw(17) << head->nilai.uts << setw(15) << head->nilai.uas << setw(10) <<
+                fixed << setprecision(2) << setw(15) << head->nilai.nilai_akhir << setw(15) << head->nilai.nilai_huruf << endl;
+            head = head->next;
+            index++;
+        }
+    } else {
+        cout << "Data kosong!" << endl;
+    }
+}
+
+void hapusData(Mahasiswa*& head, int& jumlah) { //fungsi untuk menghapus data
+    string npm;
+    cout << "Masukkan NPM mahasiswa yang akan dihapus: ";
+    cin >> npm;
+
+    Mahasiswa* prev = nullptr; //ntuk menunjuk ke simpul sebelum simpul saat ini selama pengulangan melalui linked list
+    Mahasiswa* current = head;  // untuk melintasi linked list dan menunjuk ke simpul saat ini selama pengulangan
+    while (current != nullptr) {  //Melakukan loop while untuk memeriksa setiap simpul dalam linked list. Loop akan terus berjalan selama tdk null
+        if (current->npm == npm) { //Memeriksa apakah NPM dari simpul saat ini sama dengan NPM yang dimasukkan oleh pengguna. 
+            if (prev == nullptr) { //Memeriksa apakah simpul yang akan dihapus adalah kepala linked list
+                head = current->next; //maka head diubah untuk menunjuk ke simpul berikutnya setelahnya.
+            } else {
+                prev->next = current->next; 
+            }
+            delete current;
+            jumlah--;
+            cout << "Data mahasiswa dengan NPM " << npm << " berhasil dihapus." << endl;
+            return;
+        }
+        prev = current;
+        current = current->next;  //Memajukan current ke simpul berikutnya dalam linked list
+    }
+    cout << "Data mahasiswa dengan NPM " << npm << " tidak ditemukan." << endl;
+}
+
+void findHighestScore(const Mahasiswa* head, int jumlah) { //fungsi untk menghitung score tertinggi dari data mahasiswa
+    if (head == nullptr) {
+        cout << "Data kosong!" << endl;
+        return;
+    }
+
+     //array sementara untuk menyimpan data 
+    Mahasiswa tempData[MAX_TEMP_DATA];
+    int index = 0;
+
+    //copy linked list dat ake array
+    while (head != nullptr && index < MAX_TEMP_DATA) {
+        tempData[index] = *head;
+        head = head->next;
+        index++;
+    }
+
+    //menemukan mahasiswa dengan score tertiggi
+    float highestScore = tempData[0].nilai.nilai_akhir;
+    int highestIndex = 0;
+    for (int i = 1; i < index; ++i) {
+        if (tempData[i].nilai.nilai_akhir > highestScore) {
+            highestScore = tempData[i].nilai.nilai_akhir;
+            highestIndex = i;
+        }
+    }
+
+    //detail output dari mahasiswa dengna score tertinggi
+    cout << "Mahasiswa dengan nilai akhir tertinggi:" << endl;
+    cout << "NPM: " << tempData[highestIndex].npm << endl;
+    cout << "Nama: " << tempData[highestIndex].nama << endl;
+    cout << "Nilai Absen: " << tempData[highestIndex].nilai.absen << endl;
+    cout << "Nilai Tugas: " << tempData[highestIndex].nilai.tugas << endl;
+    cout << "Nilai UTS: " << tempData[highestIndex].nilai.uts << endl;
+    cout << "Nilai UAS: " << tempData[highestIndex].nilai.uas << endl;
+    cout << "Nilai Akhir: " << tempData[highestIndex].nilai.nilai_akhir << endl;
+    cout << "Nilai Huruf: " << tempData[highestIndex].nilai.nilai_huruf << endl;
+}
+
+
+int main() {
+    Mahasiswa* head = nullptr;
+    int jumlah = 0;
+    char pilihan;
+
+    do { //untuk menjalankan menu program hingga pengguna memilih untuk kelua
+        cout << "\nMenu Program:" << endl;
+        cout << "a. Input Data Mahasiswa di Awal" << endl;
+        cout << "b. Input Data Mahasiswa di Akhir" << endl;
+        cout << "c. Insert Data Mahasiswa" << endl;
+        cout << "d. Tampil Data Mahasiswa" << endl;
+        cout << "e. Hapus Data Mahasiswa" << endl;
+        cout << "f. Mahasiswa dengan score tertinggi" << endl;
+        cout << "g. Keluar" << endl;
+        cout << "Pilih menu: ";
+        cin >> pilihan;
+
+        switch(pilihan) { //untuk mengevaluasi pilihan pengguna dan menjalankan fungsi yang sesuai berdasarkan pilihan tersebut.
+            case 'a':
+                inputDataAwal(head, jumlah);
+                break;
+            case 'b':
+                inputDataAkhir(head, jumlah);
+                break;
+            case 'c':
+                insertData(head, jumlah);
+                break;
+            case 'd':
+                tampilData(head);
+                break;
+            case 'e':
+                hapusData(head, jumlah);
+                break;
+            case 'f':
+               findHighestScore (head, jumlah);
+                break;
+            case 'g':
+                cout << "Program selesai." << endl;
+                break;
+            default:
+                cout << "Pilihan tidak valid!" << endl;
+        }
+    } while (pilihan != 'g');
+
+    //membersihkan memori
+    while (head != nullptr) {
+        Mahasiswa* next = head->next;
+        delete head;
+        head = next;
+    }
+
+    return 0;
+}
